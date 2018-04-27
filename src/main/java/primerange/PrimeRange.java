@@ -10,82 +10,65 @@ public class PrimeRange
 
     public enum Strategy
     {
-        APPROACH_A, APPROACH_B, APPROACH_C, APPROACH_D
-    }
-
-    public enum Criteria
-    {
-        SMALLEST, GREATEST
+        CLASSIC_DETERMINISTIC, MILLER_RABIN
     }
 
     /**
      * Extract a positive prime from the given range
      * @param lowerLimit the lower limit for searching for the prime > 0
      * @param upperLimit the upper limit for searching for the prime > 0
-     * @param currentStrategy the strategy employed (A or B)
-     * @param currentCrit the criteria used (smallest, largest)
+     * @param currentStrategy the strategy employed (A/B/C/D)
      * @return
      */
-    public static long extractPrime(long lowerLimit, long upperLimit, Strategy currentStrategy, Criteria currentCrit)
+    public static long extractLargestPrime(long lowerLimit, long upperLimit, Strategy currentStrategy)
     {
         int nbIterations = 5;
-        if (currentCrit == Criteria.GREATEST)
+        for (long i = upperLimit; i >= lowerLimit; --i)
         {
-            for (long i = upperLimit; i >= lowerLimit; --i)
+            switch (currentStrategy)
             {
-                switch (currentStrategy)
+                case CLASSIC_DETERMINISTIC:
+                default:
                 {
-                    case APPROACH_A:
-                    default:
-                    {
-                        if (isPrimeV1(i))
-                            return i;
-                    }
-                    case APPROACH_B:
-                    {
-                        if (isPrimeV2(i))
-                            return i;
-                    }
-                    case APPROACH_C:
-                    {
-                        if (isPrimeV3(i, nbIterations))
-                            return i;
-                    }
-                    case APPROACH_D:
-                    {
-                        if (isPrimeV4(i, nbIterations))
-                            return i;
-                    }
+                    if (isPrimeV2(i))
+                        return i;
+                }
+                case MILLER_RABIN:
+                {
+                    if (isPrimeV3(i, nbIterations))
+                        return i;
                 }
             }
         }
-        else
+
+        return INVALID_PRIME;
+    }
+
+    /**
+     * Extract a positive prime from the given range
+     * @param lowerLimit the lower limit for searching for the prime > 0
+     * @param upperLimit the upper limit for searching for the prime > 0
+     * @param currentStrategy the strategy employed (A/B/C/D)
+     * @return
+     */
+    public static long extractSmallestPrime(long lowerLimit, long upperLimit, Strategy currentStrategy)
+    {
+        int nbIterations = 5;
+
+        for (long i = lowerLimit; i <= upperLimit; ++i)
         {
-            for (long i = lowerLimit; i <= upperLimit; ++i)
+            switch (currentStrategy)
             {
-                switch (currentStrategy)
+                case CLASSIC_DETERMINISTIC:
+                default:
                 {
-                    case APPROACH_A:
-                    default:
-                    {
-                        if (isPrimeV1(i))
-                            return i;
-                    }
-                    case APPROACH_B:
-                    {
-                        if (isPrimeV2(i))
-                            return i;
-                    }
-                    case APPROACH_C:
-                    {
-                        if (isPrimeV3(i, nbIterations))
-                            return i;
-                    }
-                    case APPROACH_D:
-                    {
-                        if (isPrimeV4(i, nbIterations))
-                            return i;
-                    }
+                    if (isPrimeV2(i))
+                        return i;
+                }
+                case MILLER_RABIN:
+                {
+                    if (isPrimeV3(i, nbIterations))
+                        return i;
                 }
             }
         }
