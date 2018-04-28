@@ -129,25 +129,35 @@ public class PrimeRangeTest {
     public void categoryPartitioning() throws Exception {
 
         // Test isPrimeV2(x)
-        // x > 0
-        assertTrue(PrimeRange.isPrimeV2(15485863));
-        // x = 1
-        assertFalse(PrimeRange.isPrimeV2(1));
-        // x = 0
+        // x = 0 (fundamental special case)
         assertFalse(PrimeRange.isPrimeV2(0));
-        // x < 0
-        assertTrue(PrimeRange.isPrimeV2(-15485863));
+        // x = +1 (fundamental special case)
+        assertFalse(PrimeRange.isPrimeV2(1));
+        // x = -1 (fundamental special case)
+        assertFalse(PrimeRange.isPrimeV2(-1));
+        // x > 0 (x small 0 < x <= 2^16-1)
+        assertFalse(PrimeRange.isPrimeV2(65535));
+        // x < 0 (x small -2^16 < x < 0)
+        assertFalse(PrimeRange.isPrimeV2(65536));
+        // x > 0 (x big 0 < x <= 2^31-1)
+        assertTrue(PrimeRange.isPrimeV2(2147483647));
+        // x < 0 (x big -2^31 < x < 0)
+        assertFalse(PrimeRange.isPrimeV2(-2147483648));
 
-        // Test isPrimeV4(x)
-        // x > 0
-        assertTrue(PrimeRange.isPrimeV4(15485863));
-        // x =1
-        assertFalse(PrimeRange.isPrimeV4(1));
-        // x = 0
-        assertFalse(PrimeRange.isPrimeV4(0));
-        // x < 0
-        assertTrue(PrimeRange.isPrimeV4(-15485863));
-
-        //
+        // Test isPrimeV3(x)
+        // x = 0 (fundamental special case)
+        assertFalse(PrimeRange.isPrimeV3(0));
+        // x = +1 (fundamental special case)
+        assertFalse(PrimeRange.isPrimeV3(1));
+        // x = -1 (fundamental special case)
+        assertFalse(PrimeRange.isPrimeV3(-1));
+        // x > 0 (x small 0 < x <= 2^16-1)
+        assertFalse(PrimeRange.isPrimeV3(65535));
+        // x < 0 (x small -2^16 < x < 0)
+        assertFalse(PrimeRange.isPrimeV3(65536));
+        // x > 0 (x big 0 < x <= 2^31-1)
+        assertTrue(PrimeRange.isPrimeV3(2147483647));
+        // x < 0 (x big -2^31 < x < 0)
+        assertFalse(PrimeRange.isPrimeV3(-2147483648));
     }
 }
