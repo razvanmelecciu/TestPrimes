@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class PrimeRange {
 
-    public static final long INVALID_PRIME = -1;
+    public static final int INVALID_PRIME = -1;
 
     public static int noIterations = 5;
 
@@ -20,12 +20,12 @@ public class PrimeRange {
 
     /**
      Extract the largest prime from the given range (from A->B V B->A depending on the largest value)
+     @return the biggest prime number or INVALID_PRIME if no prime has been found
      @param limitA          the first limit for searching for the prime
      @param limitB          the second limit for searching for the prime
      @param currentStrategy the strategy employed (DETERMINISTIC/NON_DETERMINISTIC)
-     @return the biggest prime number or INVALID_PRIME if no prime has been found
      */
-    public static long extractLargestPrime(long limitA, long limitB, Strategy currentStrategy) {
+    public static int extractLargestPrime(int limitA, int limitB, Strategy currentStrategy) {
 
         if (limitA > limitB) {
             limitA = limitA ^ limitB;
@@ -34,7 +34,7 @@ public class PrimeRange {
         }
 
         int nbIterations = 5;
-        for (long i = limitB; i >= limitA; --i) {
+        for (int i = limitB; i >= limitA; --i) {
             switch (currentStrategy) {
                 case DETERMINISTIC:
                 default: {             /* Classic optimized */
@@ -42,11 +42,13 @@ public class PrimeRange {
                         return i;
                     }
                 }
+                break;
                 case NON_DETERMINISTIC: { /* Miller Rabin */
                     if (isPrimeV3(i)) {
                         return i;
                     }
                 }
+                break;
             }
         }
 
@@ -55,12 +57,12 @@ public class PrimeRange {
 
     /**
      Extract the smallest prime from the given range (from A->B V B->A depending on the largest value)
+     @return the smallest prime number or INVALID_PRIME if no prime has been found
      @param limitA          the first limit for searching for the prime
      @param limitB          the second limit for searching for the prime
      @param currentStrategy the strategy employed (DETERMINISTIC/NON_DETERMINISTIC)
-     @return the smallest prime number or INVALID_PRIME if no prime has been found
      */
-    public static long extractSmallestPrime(long limitA, long limitB, Strategy currentStrategy) {
+    public static int extractSmallestPrime(int limitA, int limitB, Strategy currentStrategy) {
 
         if (limitA > limitB) {
             limitA = limitA ^ limitB;
@@ -70,7 +72,7 @@ public class PrimeRange {
 
         int nbIterations = 5;
 
-        for (long i = limitA; i <= limitB; ++i) {
+        for (int i = limitA; i <= limitB; ++i) {
             switch (currentStrategy) {
                 case DETERMINISTIC:
                 default: {             /* Classic optimized */
@@ -78,11 +80,13 @@ public class PrimeRange {
                         return i;
                     }
                 }
+                break;
                 case NON_DETERMINISTIC: { /* Miller Rabin */
                     if (isPrimeV3(i)) {
                         return i;
                     }
                 }
+                break;
             }
         }
 
@@ -91,10 +95,10 @@ public class PrimeRange {
 
     /**
      Classic primality test
-     @param numberTested
      @return true or false
+     @param numberTested
      */
-    protected static boolean isPrimeV1(long numberTested) {
+    protected static boolean isPrimeV1(int numberTested) {
 
         numberTested = Math.abs(numberTested);
 
@@ -102,8 +106,8 @@ public class PrimeRange {
             return false;
         }
 
-        long limit = (long) Math.sqrt(numberTested);
-        for (long j = 2; j <= limit; ++j) {
+        int limit = (int) Math.sqrt(numberTested);
+        for (int j = 2; j <= limit; ++j) {
             if (numberTested % j == 0) {
                 return false;
             }
@@ -131,8 +135,8 @@ public class PrimeRange {
             return false;
         }
 
-        long j = 5;
-        long limit = (long) Math.sqrt(numberTested);
+        int j = 5;
+        int limit = (int) Math.sqrt(numberTested);
         while (j <= limit) {
             if (numberTested % j == 0 || numberTested % (j + 2) == 0) {
                 return false;
@@ -148,7 +152,7 @@ public class PrimeRange {
      @param numberTested
      @return true or false
      */
-    protected static boolean isPrimeV3(long numberTested) {
+    protected static boolean isPrimeV3(int numberTested) {
 
         if (noIterations <= 0)
             return false;
@@ -168,16 +172,17 @@ public class PrimeRange {
             return false;
         }
 
-        long s = numberTested - 1;
+        int s = numberTested - 1;
         while (s % 2 == 0) {
             s /= 2;
         }
 
         Random randGen = new Random();
         for (int i = 0; i < noIterations; i++) {
-            long randomVal = Math.abs(randGen.nextLong());
-            long a = randomVal % (numberTested - 1) + 1, temp = s;
-            long mod = modularExponentiation(a, temp, numberTested);
+            int randomVal = Math.abs(randGen.nextInt());
+            int a = randomVal % (numberTested - 1) + 1;
+            long temp = s;
+            long mod = modularExponentiation(a, s, numberTested);
             while (temp != numberTested - 1 && mod != 1 && mod != numberTested - 1) {
                 mod = modularMultiplication(mod, mod, numberTested);
                 temp *= 2;
@@ -194,7 +199,7 @@ public class PrimeRange {
      @param numberTested
      @return true or false
      */
-    protected static boolean isPrimeV4(long numberTested) {
+    protected static boolean isPrimeV4(int numberTested) {
 
         if (noIterations <= 0)
             return false;
@@ -216,8 +221,8 @@ public class PrimeRange {
 
         Random rand = new Random();
         for (int i = 0; i < noIterations; i++) {
-            long r = Math.abs(rand.nextLong());
-            long a = r % (numberTested - 1) + 1;
+            int r = Math.abs(rand.nextInt());
+            int a = r % (numberTested - 1) + 1;
             if (modularExponentiation(a, numberTested - 1, numberTested) != 1) {
                 return false;
             }
@@ -226,19 +231,32 @@ public class PrimeRange {
     }
 
     /**
-     Helper method that computes (a ^ b) % c
+     Helper method that computes (a ^ b) % c in O(log b) time
      @param a
      @param b
      @param c
      @return (a ^ b) % c
      */
-    protected static long modularExponentiation(long a, long b, long c) {
-        long result = 1;
-        for (long i = 0; i < b; i++) {
-            result *= a;
-            result %= c;            // prevents overflowing long
+    protected static long modularExponentiation(int a, int b, int c) {
+
+        // Initialize result
+        long res = 1;
+        long newA = a;
+
+        // Update a if it is more than or equal to c
+        newA = newA % c;
+
+        while (b > 0)
+        {
+            // If b is odd, multiply a with result
+            if ((b & 1)==1)
+                res = (res * newA) % c;
+
+            // b must be even now -> b = b / 2
+            b = b >> 1;
+            newA = (newA * newA) % c;
         }
-        return result % c;
+        return res;
     }
 
     /**
@@ -253,6 +271,7 @@ public class PrimeRange {
     }
 
     public static void main(String[] argc) {
+
         System.out.println("Largest prime -> deterministic");
         System.out.println(extractLargestPrime(2, 11, Strategy.DETERMINISTIC));
         System.out.println(extractLargestPrime(150, 300, Strategy.DETERMINISTIC));
@@ -269,6 +288,8 @@ public class PrimeRange {
 
         System.out.println("Smallest prime -> deterministic");
         System.out.println(extractSmallestPrime(-5, 11, Strategy.DETERMINISTIC));
+
+        System.out.println(extractLargestPrime(2147483647 - 100, 2147483647, Strategy.NON_DETERMINISTIC));
     }
 }
 
