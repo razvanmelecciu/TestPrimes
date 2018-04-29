@@ -3,8 +3,7 @@ package primerange;
 import static org.junit.Assert.*;
 
 /**
- Class with tests for the PrimeRange class
- */
+ Class with tests for the PrimeRange class */
 public class PrimeRangeTest {
     /**
      Equivalence partitioning tests
@@ -102,11 +101,11 @@ public class PrimeRangeTest {
         // 1-1-1
         assertEquals(PrimeRange.extractLargestPrime(-17, -17, PrimeRange.Strategy.DETERMINISTIC), -17);
         // 1-1-2
-        assertEquals(PrimeRange.extractLargestPrime(-1, -1,   PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
         // 1-2-1
         assertEquals(PrimeRange.extractLargestPrime(-17, -17, PrimeRange.Strategy.NON_DETERMINISTIC), -17);
         // 1-2-2
-        assertEquals(PrimeRange.extractLargestPrime(-1, -1,   PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
         // 2-1-2
         assertEquals(PrimeRange.extractLargestPrime(0, 0, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
         // 2-2-2
@@ -127,6 +126,10 @@ public class PrimeRangeTest {
      */
     @org.junit.Test
     public void categoryPartitioning() throws Exception {
+
+        /*
+        First testing out the subcomponents of extractLargestPrime like the isPrime group of functions
+        */
 
         // Test isPrimeV2(x)
         // x = 0 (fundamental special case)
@@ -159,5 +162,106 @@ public class PrimeRangeTest {
         assertTrue(PrimeRange.isPrimeV3(2147483647));
         // x < 0 (x big -2^31 < x < 0)
         assertFalse(PrimeRange.isPrimeV3(-2147483648));
+
+        /*
+        The basic categories for the tests of extractLargestPrime
+        a_1 = 0, a_2 = -1, a_3 = 1, a_4 > 0 with a prime, a_5 > 0 with a not prime, a_6 < 0 with a prime, a_7 < 0 with a not prime
+        b_1 = 0, b_2 = -1, b_3 = 1, b_4 > 0 with b prime, b_5 > 0 with b not prime, b_6 < 0 with b prime, b_7 < 0 with b not prime
+        m_1 = DETERMINISTIC, m_2 = NON_DETERMINISTIC
+        r_1 = INVALID_PRIME, r_2 != INVALID_PRIME
+        */
+
+        // a_1 + b_1 + m_1 + r_1;
+        assertEquals(PrimeRange.extractLargestPrime(0, 0, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_1 + b_1 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(0, 0, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_2 + b_2 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_2 + b_2 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_3 + b_3 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(1, 1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_3 + b_3 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(1, 1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_4 + b_4 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, 47189, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_4 + b_4 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, 47189, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_4 + b_5 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, 47180, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_4 + b_5 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, 47180, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_4 + b_6 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, -5, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_4 + b_6 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, -5, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_4 + b_7 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, -10, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_4 + b_7 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47189, -10, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_5 + b_4 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47190, 47189, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_5 + b_4 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(47190, 47189, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_5 + b_5 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(14, 16, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_5 + b_5 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(14, 16, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_5 + b_5 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(14, 20, PrimeRange.Strategy.DETERMINISTIC), 19);
+        // a_5 + b_5 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(14, 20, PrimeRange.Strategy.NON_DETERMINISTIC), 19);
+        // a_5 + b_6 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(12, -5, PrimeRange.Strategy.DETERMINISTIC), 11);
+        // a_5 + b_6 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(12, -5, PrimeRange.Strategy.NON_DETERMINISTIC), 11);
+        // a_5 + b_7 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(1, -1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_5 + b_7 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(1, -1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_5 + b_7 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(10, -10, PrimeRange.Strategy.DETERMINISTIC), 7);
+        // a_5 + b_7 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(10, -10, PrimeRange.Strategy.NON_DETERMINISTIC), 7);
+        // a_6 + b_4 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, 47189, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_6 + b_4 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, 47189, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_6 + b_5 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, 47190, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_6 + b_5 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, 47190, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_6 + b_6 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, -5, PrimeRange.Strategy.DETERMINISTIC), -5);
+        // a_6 + b_6 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, -5, PrimeRange.Strategy.NON_DETERMINISTIC), -5);
+        // a_6 + b_7 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, -10, PrimeRange.Strategy.DETERMINISTIC), -11);
+        // a_6 + b_7 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-11, -10, PrimeRange.Strategy.NON_DETERMINISTIC), -11);
+        // a_7 + b_4 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, 47189, PrimeRange.Strategy.DETERMINISTIC), 47189);
+        // a_7 + b_4 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, 47189, PrimeRange.Strategy.NON_DETERMINISTIC), 47189);
+        // a_7 + b_5 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1,  1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_7 + b_5 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1,  1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_7 + b_5 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, 20, PrimeRange.Strategy.DETERMINISTIC), 19);
+        // a_7 + b_5 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, 20, PrimeRange.Strategy.NON_DETERMINISTIC), 19);
+        // a_7 + b_6 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, -5, PrimeRange.Strategy.DETERMINISTIC), -5);
+        // a_7 + b_6 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, -5, PrimeRange.Strategy.NON_DETERMINISTIC), -5);
+        // a_7 + b_7 + m_1 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_7 + b_7 + m_2 + r_1
+        assertEquals(PrimeRange.extractLargestPrime(-1, -1, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // a_7 + b_7 + m_1 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, -2, PrimeRange.Strategy.DETERMINISTIC), -2);
+        // a_7 + b_7 + m_2 + r_2
+        assertEquals(PrimeRange.extractLargestPrime(-10, -2, PrimeRange.Strategy.NON_DETERMINISTIC), -2);
     }
 }
