@@ -264,4 +264,125 @@ public class PrimeRangeTest {
         // a_7 + b_7 + m_2 + r_2
         assertEquals(PrimeRange.extractLargestPrime(-10, -2, PrimeRange.Strategy.NON_DETERMINISTIC), -2);
     }
+
+    /**
+     Structural testing - instruction (statement) level - using the method's execution graph
+     @throws Exception
+     */
+    @org.junit.Test
+    public void statementCoverage() throws Exception {
+
+        // Lines 32, 32, 33 - hit when A > B
+        assertEquals(PrimeRange.extractLargestPrime(11, 5, PrimeRange.Strategy.DETERMINISTIC), 11);
+        // Lines 37 and 38 - always hit regardless of the input
+        assertEquals(PrimeRange.extractLargestPrime(11, 11, PrimeRange.Strategy.DETERMINISTIC), 11);
+        // Line 41 - hit when the method is DETERMINISTIC
+        assertEquals(PrimeRange.extractLargestPrime(0, 11, PrimeRange.Strategy.DETERMINISTIC), 11);
+        // Line 47 - hit when the method is NON_DETERMINISTIC
+        assertEquals(PrimeRange.extractLargestPrime(0, 11, PrimeRange.Strategy.NON_DETERMINISTIC), 11);
+        // Line 42 - hit when A=prime or B=prime or between A and B there is at least one prime and the method is M1
+        assertEquals(PrimeRange.extractLargestPrime(11, 6, PrimeRange.Strategy.DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(11, 11, PrimeRange.Strategy.DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(6, 11, PrimeRange.Strategy.DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(4, 6, PrimeRange.Strategy.DETERMINISTIC), 5);
+        // Line 48 - hit when A=prime or B=prime or between A and B there is at least one prime and the method is M2
+        assertEquals(PrimeRange.extractLargestPrime(11, 6, PrimeRange.Strategy.NON_DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(11, 11, PrimeRange.Strategy.NON_DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(6, 11, PrimeRange.Strategy.NON_DETERMINISTIC), 11);
+        assertEquals(PrimeRange.extractLargestPrime(4, 6, PrimeRange.Strategy.NON_DETERMINISTIC), 5);
+        // Line 55 - hit when there are no prime numbers
+        assertEquals(PrimeRange.extractLargestPrime(4, 4, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        assertEquals(PrimeRange.extractLargestPrime(14, 16, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+    }
+
+    /**
+     Structural testing - decision coverage level - using the method's execution graph
+     @throws Exception
+     */
+    @org.junit.Test
+    public void decisionCoverage() throws Exception {
+        // Line 30 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(109, 100, PrimeRange.Strategy.DETERMINISTIC), 109);
+        // Line 41 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(257, 257, PrimeRange.Strategy.DETERMINISTIC), 257);
+        // Line 47 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(337, 337, PrimeRange.Strategy.NON_DETERMINISTIC), 337);
+    }
+
+    /**
+     Structural testing - condition coverage level - using the method's execution graph
+     @throws Exception
+     */
+    @org.junit.Test
+    public void conditionCoverage() throws Exception {
+        // Line 30 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(12227, 12200, PrimeRange.Strategy.DETERMINISTIC), 12227);
+        // Line 30 - condition in graph evaluation to False
+        assertEquals(PrimeRange.extractLargestPrime(12200, 12227, PrimeRange.Strategy.DETERMINISTIC), 12227);
+        // Line 41 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(3623, 3623, PrimeRange.Strategy.DETERMINISTIC), 3623);
+        // Line 41 - condition in graph evaluation to False
+        assertEquals(PrimeRange.extractLargestPrime(300, 300, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // Line 47 - condition in graph evaluation to True
+        assertEquals(PrimeRange.extractLargestPrime(3623, 3623, PrimeRange.Strategy.NON_DETERMINISTIC), 3623);
+        // Line 47 - condition in graph evaluation to False
+        assertEquals(PrimeRange.extractLargestPrime(300, 300, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+    }
+
+    /**
+     Structural testing - path coverage level - using the method's execution graph and the associated regex
+     @throws Exception
+     */
+    @org.junit.Test
+    public void pathCoverage() throws Exception {
+
+        /*
+        re = 30 . (31 | 36) . 37 . (38 . (41 . (42 | 37) | 47 . (48 | 37) ) )+ . 55?
+
+        30, 31, 36, 37, 38, 41, 42            -> A > B, A prime, B anything, Method 1
+
+        30, 31, 36, 37, (38, 41, 37)+, 55     -> A > B, A not prime, B prime, Method 1
+                                              -> A > B, A not prime, B not prime, Method 1
+
+        30, 31, 36, 37, 38, 47, 48            -> A > B, A prime, B anything, Method 2
+
+        30, 31, 36, 37, (38, 47, 37)+, 55     -> A > B, A not prime, B prime, Method 2
+                                              -> A > B, A not prime, B not prime, Method 2
+
+        30, 36, 37, 38, 41, 42                -> A < B, A not prime, B prime, Method 1
+
+        30, 36, 37, (38, 41, 37)+, 55         -> A < B, A prime, B not prime, Method 1
+                                              -> A < B, A not prime, B not prime, Method 1
+
+        30, 36, 37, 38, 47, 48                -> A < B, A not prime, B prime, Method 2
+
+        30, 36, 37, (38, 47, 37)+, 55         -> A < B, A prime, B not prime, Method 1
+                                              -> A < B, A not prime, B not prime, Method 1
+        */
+
+        // A > B, A prime, B anything, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(17, 6, PrimeRange.Strategy.DETERMINISTIC), 17);
+        // A > B, A not prime, B prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(18, 11, PrimeRange.Strategy.DETERMINISTIC), 17);
+        // A > B, A not prime, B not prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(16, 14, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // A > B, A prime, B anything, Method 2
+        assertEquals(PrimeRange.extractLargestPrime(17, 10, PrimeRange.Strategy.NON_DETERMINISTIC), 17);
+        // A > B, A not prime, B prime, Method 2
+        assertEquals(PrimeRange.extractLargestPrime(18, 11, PrimeRange.Strategy.NON_DETERMINISTIC), 17);
+        // A > B, A not prime, B not prime, Method 2
+        assertEquals(PrimeRange.extractLargestPrime(16, 14, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // A < B, A not prime, B prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(6, 17, PrimeRange.Strategy.DETERMINISTIC), 17);
+        // A < B, A prime, B not prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(11, 18, PrimeRange.Strategy.DETERMINISTIC), 17);
+        // A < B, A not prime, B not prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(14, 16, PrimeRange.Strategy.DETERMINISTIC), PrimeRange.INVALID_PRIME);
+        // A < B, A not prime, B prime, Method 2
+        assertEquals(PrimeRange.extractLargestPrime(10, 17, PrimeRange.Strategy.NON_DETERMINISTIC), 17);
+        // A < B, A prime, B not prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(11, 18, PrimeRange.Strategy.NON_DETERMINISTIC), 17);
+        // A < B, A not prime, B not prime, Method 1
+        assertEquals(PrimeRange.extractLargestPrime(14, 16, PrimeRange.Strategy.NON_DETERMINISTIC), PrimeRange.INVALID_PRIME);
+    }
 }
